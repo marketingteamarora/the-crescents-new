@@ -1,52 +1,34 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Disable ESLint during builds
+  // Basic configuration
   eslint: {
     ignoreDuringBuilds: true,
   },
-  // Disable TypeScript type checking during builds
   typescript: {
     ignoreBuildErrors: true,
   },
-  // Image optimization
+  // Image optimization for static export
   images: {
     unoptimized: true,
     loader: 'custom',
     loaderFile: './src/app/image-loader.ts',
   },
-  // Enable static export
+  // Static export configuration
   output: 'export',
-  // Add trailing slashes to all paths for better compatibility
   trailingSlash: true,
-  // Enable React strict mode
   reactStrictMode: true,
-  // Disable server components (needed for static export)
-  experimental: {
-    serverComponentsExternalPackages: [],
-  },
-  // Configure webpack
-  webpack: (config, { isServer }) => {
-    // Important: return the modified config
+  
+  // Remove experimental settings that cause warnings
+  
+  // Webpack configuration
+  webpack: (config) => {
     return config;
   },
-  // Environment variables to expose to the browser
+  
+  // Environment variables
   env: {
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  },
-  // Add CORS headers for API routes
-  async headers() {
-    return [
-      {
-        source: '/api/:path*',
-        headers: [
-          { key: 'Access-Control-Allow-Credentials', value: 'true' },
-          { key: 'Access-Control-Allow-Origin', value: '*' },
-          { key: 'Access-Control-Allow-Methods', value: 'GET,OPTIONS,PATCH,DELETE,POST,PUT' },
-          { key: 'Access-Control-Allow-Headers', value: 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, apikey, Authorization' },
-        ],
-      },
-    ]
+    NEXT_PUBLIC_SUPABASE_URL: 'https://hkvknskptiiniqdwitau.supabase.co',
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhrdmtuc2twdGlpbmlxZHdpdGF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMxODUwODgsImV4cCI6MjA2ODc2MTA4OH0.nunS_DYeEWX_0ROg8STpR6oz_1MQ8kWUXWsV9paaGOo',
   },
   // Rewrite API requests to go through our proxy
   async rewrites() {

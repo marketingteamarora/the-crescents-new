@@ -1,40 +1,8 @@
 import { createClient } from "@supabase/supabase-js"
 
 // These are the public env vars that will be available on the client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-
-// Determine if we're in a browser environment
-const isBrowser = typeof window !== 'undefined';
-
-// Create a custom fetch function that uses our proxy in production
-const customFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-  // Handle both string and URL/Request objects
-  const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
-  
-  // In production, route Supabase API requests through our proxy
-  if (process.env.NODE_ENV === 'production' && isBrowser && typeof url === 'string') {
-    const proxyUrl = new URL('/api/supabase', window.location.origin);
-    const originalUrl = new URL(url);
-    
-    // Extract the path after /rest/v1
-    const pathMatch = originalUrl.pathname.match(/\/rest\/v1(\/.*)/);
-    if (pathMatch) {
-      proxyUrl.searchParams.set('path', pathMatch[1]);
-    }
-    
-    // Copy all search params to the proxy URL
-    originalUrl.searchParams.forEach((value, key) => {
-      proxyUrl.searchParams.set(key, value);
-    });
-    
-    // Update the URL to use our proxy
-    return fetch(proxyUrl.toString(), init);
-  }
-  
-  // Fall back to the original fetch for non-browser or non-production environments
-  return fetch(input, init);
-};
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://hkvknskptiiniqdwitau.supabase.co'
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhrdmtuc2twdGlpbmlxZHdpdGF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMxODUwODgsImV4cCI6MjA2ODc2MTA4OH0.nunS_DYeEWX_0ROg8STpR6oz_1MQ8kWUXWsV9paaGOo'
 
 // Create a single supabase client for interacting with your database
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
@@ -42,9 +10,6 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
-  },
-  global: {
-    fetch: customFetch,
   },
 })
 
