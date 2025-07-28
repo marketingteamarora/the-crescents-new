@@ -3,13 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "next build",
     "dev": "next dev",
-    "lint": "next lint",
+    "build": "next build && next export",
     "start": "next start",
+    "lint": "next lint",
+    "export": "next export",
     "migrate": "tsx scripts/apply-migration.ts",
     "db:create-migration": "tsx scripts/create-migration.ts",
-    "db:migrate": "tsx scripts/apply-migration.ts"
+    "db:migrate": "tsx scripts/apply-migration.ts",
+    "vercel-build": "next build && next export"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

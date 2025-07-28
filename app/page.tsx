@@ -842,8 +842,8 @@ const styles = `
 }
 `
 
-// Inject styles
-if (typeof document !== "undefined") {
+// Inject styles in the browser
+if (typeof window !== 'undefined') {
   const styleSheet = document.createElement("style")
   styleSheet.textContent = styles
   document.head.appendChild(styleSheet)
