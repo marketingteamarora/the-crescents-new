@@ -1,24 +1,37 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Disable ESLint during builds
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // Disable TypeScript type checking during builds
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Image optimization
   images: {
     unoptimized: true,
   },
-  // Ensure static export
+  // Enable static export
   output: 'export',
-  // Optional: Add a trailing slash to all paths
+  // Add trailing slashes to all paths for better compatibility
   trailingSlash: true,
-  // Optional: Enable React strict mode
+  // Enable React strict mode
   reactStrictMode: true,
-  // Optional: Add base path if your app is served from a subdirectory
-  // basePath: '/your-base-path',
-  // Optional: Configure the build output directory
-  distDir: 'out',
+  // Disable server components (needed for static export)
+  experimental: {
+    serverComponentsExternalPackages: [],
+  },
+  // Configure webpack
+  webpack: (config, { isServer }) => {
+    // Important: return the modified config
+    return config;
+  },
+  // Disable image optimization API routes for static export
+  images: {
+    loader: 'custom',
+    loaderFile: './src/app/image-loader.ts',
+  },
 }
 
 export default nextConfig
