@@ -4,12 +4,47 @@ import { createClient } from "@supabase/supabase-js"
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
+// Determine if we're in a browser environment
+const isBrowser = typeof window !== 'undefined';
+
+// Create a custom fetch function that uses our proxy in production
+const customFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+  // Handle both string and URL/Request objects
+  const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+  
+  // In production, route Supabase API requests through our proxy
+  if (process.env.NODE_ENV === 'production' && isBrowser && typeof url === 'string') {
+    const proxyUrl = new URL('/api/supabase', window.location.origin);
+    const originalUrl = new URL(url);
+    
+    // Extract the path after /rest/v1
+    const pathMatch = originalUrl.pathname.match(/\/rest\/v1(\/.*)/);
+    if (pathMatch) {
+      proxyUrl.searchParams.set('path', pathMatch[1]);
+    }
+    
+    // Copy all search params to the proxy URL
+    originalUrl.searchParams.forEach((value, key) => {
+      proxyUrl.searchParams.set(key, value);
+    });
+    
+    // Update the URL to use our proxy
+    return fetch(proxyUrl.toString(), init);
+  }
+  
+  // Fall back to the original fetch for non-browser or non-production environments
+  return fetch(input, init);
+};
+
 // Create a single supabase client for interacting with your database
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
+  },
+  global: {
+    fetch: customFetch,
   },
 })
 
