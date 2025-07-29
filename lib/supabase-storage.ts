@@ -54,13 +54,14 @@ export class SupabaseStorage {
           // No data found
           return null
         }
+        console.error("Error loading content:", error)
         throw error
       }
 
       return data.content as LandingPageContent
     } catch (error) {
       console.error("Error loading content:", error)
-      return null
+      throw error
     }
   }
 
