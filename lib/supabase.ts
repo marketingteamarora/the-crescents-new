@@ -2,8 +2,8 @@ import { createClient } from "@supabase/supabase-js"
 import { createBrowserClient } from '@supabase/ssr'
 
 // These are the public env vars that will be available on the client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://hkvknskptiiniqdwitau.supabase.co'
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhrdmtuc2twdGlpbmlxZHdpdGF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMxODUwODgsImV4cCI6MjA2ODc2MTA4OH0.nunS_DYeEWX_0ROg8STpR6oz_1MQ8kWUXWsV9paaGOo'
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 // Create a single supabase client for the browser
 // Using createBrowserClient from @supabase/ssr for better Next.js integration
@@ -18,7 +18,7 @@ export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey, {
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'apikey': supabaseAnonKey,
+
     },
   },
 })
