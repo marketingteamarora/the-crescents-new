@@ -6,36 +6,30 @@ import type { LandingPageContentRow, ContentTemplateRow, UploadedImageRow } from
 
 export class SupabaseStorage {
   // Content Management
-  async saveContent(content: LandingPageContent): Promise<void> {
+  async saveContent(content: LandingPageContent): Promise<any> {
     try {
-      // Check if user is authenticated
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser()
-
+      // Get the current user
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
       if (authError || !user) {
-        throw new Error("You must be authenticated to save content")
+        throw new Error("You must be authenticated to save content");
       }
 
-      // First, deactivate all existing content
-      await supabase.from("landing_page_content").update({ is_active: false }).eq("is_active", true)
-
-      // Insert new content as active
-      const { error } = await supabase.from("landing_page_content").insert({
-        content,
-        is_active: true,
-        user_id: user.id,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
+      // Call the database function to handle the save operation
+      const { data, error } = await supabase.rpc('save_landing_page_content', {
+        p_content: content,
+        p_user_id: user.id
+      });
 
       if (error) {
-        throw error
+        console.error('Database error during save:', error);
+        throw new Error(`Failed to save content: ${error.message}`);
       }
+
+      return data;
     } catch (error) {
-      console.error("Error saving content:", error)
-      throw error
+      console.error("Error in saveContent:", error);
+      throw error;
     }
   }
 

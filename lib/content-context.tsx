@@ -6,10 +6,15 @@ import { storage } from "./supabase-storage"
 import { defaultContent } from "./default-content"
 import type { LandingPageContent } from "@/types/content"
 
+interface SaveResult {
+  success: boolean;
+  message: string;
+}
+
 interface ContentContextType {
   content: LandingPageContent
   setContent: (content: LandingPageContent) => void
-  saveContent: () => Promise<void>
+  saveContent: () => Promise<SaveResult>
   loading: boolean
   hasChanges: boolean
   lastSaved: Date | null
@@ -108,18 +113,31 @@ export function ContentProvider({ children }: { children: ReactNode }) {
   }
 
   const saveContent = async () => {
-    if (isSaving) return // Prevent concurrent saves
+    if (isSaving) {
+      console.log('Save already in progress');
+      return { success: false, message: 'Save already in progress' };
+    }
     
-    setIsSaving(true)
+    setIsSaving(true);
+    
     try {
-      await storage.saveContent(content)
-      setOriginalContent(content)
-      setLastSaved(new Date())
+      const result = await storage.saveContent(content);
+      
+      if (result && result.success) {
+        setOriginalContent(content);
+        setLastSaved(new Date());
+        return { success: true, message: 'Content saved successfully' };
+      } else {
+        const errorMessage = result?.message || 'Failed to save content';
+        console.error('Save error:', errorMessage);
+        return { success: false, message: errorMessage };
+      }
     } catch (error) {
-      console.error("Error saving content:", error)
-      throw error
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      console.error("Error saving content:", error);
+      return { success: false, message: errorMessage };
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
   }
 
