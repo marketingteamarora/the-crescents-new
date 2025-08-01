@@ -1,35 +1,67 @@
 "use client"
 
-import { supabase } from "./supabase"
+import { createBrowserClient } from '@supabase/ssr'
+
+// Create a single supabase client for interacting with your database
+const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+
 import type { LandingPageContent } from "@/types/content"
 import type { LandingPageContentRow, ContentTemplateRow, UploadedImageRow } from "./supabase"
 
 export class SupabaseStorage {
   // Content Management
-  async saveContent(content: LandingPageContent): Promise<any> {
+  static async saveContent(content: any): Promise<{ success: boolean; error?: string; status?: number; data?: any; details?: any }> {
     try {
       // Get the current user
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      const { data: { user }, error: userError } = await supabase.auth.getUser()
       
-      if (authError || !user) {
-        throw new Error("You must be authenticated to save content");
+      if (userError || !user) {
+        console.error('User not authenticated:', userError)
+        return { success: false, error: 'Not authenticated' }
       }
 
-      // Call the database function to handle the save operation
-      const { data, error } = await supabase.rpc('save_landing_page_content_api', {
-        content_data: content,
-        user_uuid: user.id
-      });
+      // Call our new API endpoint
+      console.log('Saving content via API route...')
+      const response = await fetch('/api/save-content', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content }),
+      })
 
-      if (error) {
-        console.error('Database error during save:', error);
-        throw new Error(`Failed to save content: ${error.message}`);
+      if (!response.ok) {
+        let errorMessage = 'Failed to save content'
+        try {
+          const errorData = await response.json()
+          console.error('API error response:', errorData)
+          errorMessage = errorData.error || errorData.message || errorMessage
+        } catch (e) {
+          console.error('Error parsing error response:', e)
+        }
+        return { 
+          success: false, 
+          error: errorMessage,
+          status: response.status
+        }
       }
 
-      return data;
+      const result = await response.json()
+      console.log('Content saved successfully:', result)
+      return { 
+        success: true,
+        data: result.content
+      }
     } catch (error) {
-      console.error("Error in saveContent:", error);
-      throw error;
+      console.error('Error in saveContent:', error)
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to save content',
+        details: error
+      }
     }
   }
 
