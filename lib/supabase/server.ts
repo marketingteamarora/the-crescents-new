@@ -1,13 +1,15 @@
 import { createClient } from "@supabase/supabase-js"
 
 // This is a server-side only client that can be used in API routes
-// It uses the service role key which bypasses RLS - use with caution!
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+// In production, it uses the service role key which bypasses RLS - use with caution!
+// In development, it falls back to the anon key for local development
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || supabaseAnonKey
 
 if (!supabaseUrl || !supabaseServiceKey) {
   throw new Error(
-    'Missing environment variables NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY'
+    'Missing required Supabase environment variables. Please ensure NEXT_PUBLIC_SUPABASE_URL and either SUPABASE_SERVICE_ROLE_KEY or NEXT_PUBLIC_SUPABASE_ANON_KEY are set.'
   )
 }
 

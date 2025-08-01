@@ -2,17 +2,39 @@ import { NextResponse } from "next/server"
 import { supabaseServer } from "@/lib/supabase/server"
 import { defaultContent } from "@/lib/default-content"
 
+// Log environment variables for debugging (don't log actual keys in production)
+const logEnv = () => {
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Environment variables:')
+    console.log('- NEXT_PUBLIC_SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL ? 'Set' : 'Not set')
+    console.log('- NEXT_PUBLIC_SUPABASE_ANON_KEY:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'Set' : 'Not set')
+    console.log('- SUPABASE_SERVICE_ROLE_KEY:', process.env.SUPABASE_SERVICE_ROLE_KEY ? 'Set' : 'Not set')
+  }
+}
+
 // Revalidate every 60 seconds
 export const revalidate = 60
 
 export async function GET() {
   console.log("Fetching content from Supabase...")
+  logEnv() // Log environment status
   
   try {
     // First, verify the Supabase client is initialized
     if (!supabaseServer) {
-      console.error("Supabase client not initialized")
-      throw new Error("Supabase client not initialized")
+      const error = new Error("Supabase client not initialized")
+      console.error(error.message)
+      return NextResponse.json(
+        { 
+          ...defaultContent,
+          _debug: { 
+            error: 'Server configuration error',
+            message: error.message,
+            env: process.env.NODE_ENV
+          }
+        },
+        { status: 500 }
+      )
     }
 
     console.log("Supabase client initialized, making query...")
