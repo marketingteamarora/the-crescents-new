@@ -28,25 +28,27 @@ export function SupabaseTemplateManager({ currentContent, onLoadTemplate }: Supa
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
 
+  const [storage] = useState(() => new SupabaseStorage())
+
   useEffect(() => {
     loadTemplates()
   }, [])
 
   // Set up real-time subscription for templates
   useEffect(() => {
-    const subscription = SupabaseStorage.subscribeToTemplateChanges((payload) => {
+    const subscription = storage.subscribeToTemplateChanges((payload) => {
       loadTemplates() // Reload templates when changes occur
     })
 
     return () => {
       subscription.unsubscribe()
     }
-  }, [])
+  }, [storage])
 
   const loadTemplates = async () => {
     setIsLoading(true)
     try {
-      const result = await SupabaseStorage.loadTemplates()
+      const result = await storage.loadTemplates()
       if (result.success && result.data) {
         setTemplates(result.data)
       } else if (result.error) {
@@ -68,7 +70,7 @@ export function SupabaseTemplateManager({ currentContent, onLoadTemplate }: Supa
 
     setIsSaving(true)
     try {
-      const result = await SupabaseStorage.saveTemplate(
+      const result = await storage.saveTemplate(
         templateName,
         currentContent,
         templateDescription || undefined,
@@ -100,7 +102,7 @@ export function SupabaseTemplateManager({ currentContent, onLoadTemplate }: Supa
   const handleDeleteTemplate = async (template: ContentTemplateRow) => {
     if (confirm(`Are you sure you want to delete template "${template.name}"?`)) {
       try {
-        const result = await SupabaseStorage.deleteTemplate(template.id)
+        const result = await storage.deleteTemplate(template.id)
         if (result.success) {
           toast.success(`Template "${template.name}" deleted successfully!`)
           loadTemplates()

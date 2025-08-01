@@ -13,7 +13,7 @@ import type { LandingPageContentRow, ContentTemplateRow, UploadedImageRow } from
 
 export class SupabaseStorage {
   // Content Management
-  static async saveContent(content: any): Promise<{ success: boolean; error?: string; status?: number; data?: any; details?: any }> {
+  async saveContent(content: any): Promise<{ success: boolean; error?: string; status?: number; data?: any; details?: any }> {
     try {
       // Get the current user
       const { data: { user }, error: userError } = await supabase.auth.getUser()
@@ -91,7 +91,7 @@ export class SupabaseStorage {
     }
   }
 
-  static async loadActiveContent(): Promise<{ success: boolean; data?: LandingPageContent; error?: string }> {
+  async loadActiveContent(): Promise<{ success: boolean; data?: LandingPageContent; error?: string }> {
     try {
       const { data, error } = await supabase
         .from("landing_page_content")
@@ -118,7 +118,7 @@ export class SupabaseStorage {
     }
   }
 
-  static async getContentHistory(): Promise<{ success: boolean; data?: LandingPageContentRow[]; error?: string }> {
+  async getContentHistory(): Promise<{ success: boolean; data?: LandingPageContentRow[]; error?: string }> {
     try {
       const { data, error } = await supabase
         .from("landing_page_content")
@@ -139,7 +139,7 @@ export class SupabaseStorage {
   }
 
   // Template Management
-  static async saveTemplate(
+  async saveTemplate(
     name: string,
     content: LandingPageContent,
     description?: string,
@@ -170,7 +170,7 @@ export class SupabaseStorage {
     }
   }
 
-  static async loadTemplates(): Promise<{ success: boolean; data?: ContentTemplateRow[]; error?: string }> {
+  async loadTemplates(): Promise<{ success: boolean; data?: ContentTemplateRow[]; error?: string }> {
     try {
       const { data, error } = await supabase
         .from("content_templates")
@@ -189,7 +189,7 @@ export class SupabaseStorage {
     }
   }
 
-  static async deleteTemplate(id: string): Promise<{ success: boolean; error?: string }> {
+  async deleteTemplate(id: string): Promise<{ success: boolean; error?: string }> {
     try {
       const { error } = await supabase.from("content_templates").delete().eq("id", id)
 
@@ -324,7 +324,7 @@ export class SupabaseStorage {
       .subscribe()
   }
 
-  static subscribeToTemplateChanges(callback: (payload: any) => void) {
+  subscribeToTemplateChanges(callback: (payload: any) => void) {
     return supabase
       .channel("content_templates_changes")
       .on(
