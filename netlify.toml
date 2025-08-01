@@ -1,13 +1,28 @@
 [build]
   command = "npm run build"
   publish = ".next"
+  functions = ".next/functions"
 
 [build.environment]
-  NEXT_USE_NETLIFY_EDGE = "false"
+  NODE_VERSION = "18"
+  NPM_FLAGS = "--legacy-peer-deps"
   NEXT_TELEMETRY_DISABLED = "1"
+  NEXT_USE_NETLIFY_EDGE = "false"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+  [plugins.inputs]
+    functions_src = ".next/functions"
+
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["@supabase/ssr", "@supabase/supabase-js"]
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+  force = true
 
 [dev]
   framework = "next"
