@@ -38,10 +38,10 @@ export default function NetlifyTestPage() {
         throw new Error(userError?.message || 'Not authenticated')
       }
 
-      // Test RPC call
-      const { data, error } = await supabase.rpc('save_landing_page_content_v2', {
-        p_content: { test: 'Netlify test ' + new Date().toISOString() },
-        p_user_id: user.id
+      // Test RPC call with new function
+      const { data, error } = await supabase.rpc('save_landing_page_content_api', {
+        content_data: { test: 'Netlify test ' + new Date().toISOString() },
+        user_uuid: user.id
       })
       
       if (error) throw error
@@ -75,7 +75,8 @@ export default function NetlifyTestPage() {
       }
 
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-      const response = await fetch(`${supabaseUrl}/rest/v1/rpc/save_landing_page_content_v2`, {
+      // Direct API call to new function
+      const response = await fetch(`${supabaseUrl}/rest/v1/rpc/save_landing_page_content_api`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -83,8 +84,8 @@ export default function NetlifyTestPage() {
           'Authorization': `Bearer ${session.access_token}`
         },
         body: JSON.stringify({
-          p_content: { test: 'Direct API test ' + new Date().toISOString() },
-          p_user_id: session.user.id
+          content_data: { test: 'Direct API test ' + new Date().toISOString() },
+          user_uuid: session.user.id
         })
       })
       
