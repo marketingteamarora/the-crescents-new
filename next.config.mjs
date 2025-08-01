@@ -7,16 +7,19 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // Image optimization for static export
+  // Image optimization
   images: {
     unoptimized: true,
     loader: 'custom',
     loaderFile: './src/app/image-loader.ts',
   },
-  // Static export configuration
-  output: 'export',
+  // Remove static export for API routes to work
   trailingSlash: true,
   reactStrictMode: true,
+  // Enable server components and API routes
+  experimental: {
+    serverActions: true,
+  },
   
   // Remove experimental settings that cause warnings
   
