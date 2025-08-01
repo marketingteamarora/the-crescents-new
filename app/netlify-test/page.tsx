@@ -39,7 +39,7 @@ export default function NetlifyTestPage() {
       }
 
       // Test RPC call
-      const { data, error } = await supabase.rpc('save_landing_page_content', {
+      const { data, error } = await supabase.rpc('save_landing_page_content_v2', {
         p_content: { test: 'Netlify test ' + new Date().toISOString() },
         p_user_id: user.id
       })
@@ -75,7 +75,7 @@ export default function NetlifyTestPage() {
       }
 
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-      const response = await fetch(`${supabaseUrl}/rest/v1/rpc/save_landing_page_content`, {
+      const response = await fetch(`${supabaseUrl}/rest/v1/rpc/save_landing_page_content_v2`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -16,7 +16,7 @@ export class SupabaseStorage {
       }
 
       // Call the database function to handle the save operation
-      const { data, error } = await supabase.rpc('save_landing_page_content', {
+      const { data, error } = await supabase.rpc('save_landing_page_content_v2', {
         p_content: content,
         p_user_id: user.id
       });
