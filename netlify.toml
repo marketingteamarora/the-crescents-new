@@ -5,36 +5,20 @@
 
 [build.environment]
   NODE_VERSION = "18"
-  NPM_FLAGS = "--legacy-peer-deps"
-  NEXT_TELEMETRY_DISABLED = "1"
-  NEXT_USE_NETLIFY_EDGE = "false"
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
 
 [functions]
   node_bundler = "esbuild"
   external_node_modules = ["@supabase/supabase-js"]
 
-# Redirect all API requests to Netlify Functions
+# Handle all API routes
 [[redirects]]
-  from = "/api/hello"
-  to = "/.netlify/functions/hello"
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
   status = 200
-
-[[redirects]]
-  from = "/api/content"
-  to = "/.netlify/functions/content"
-  status = 200
+  force = true
 
 # Handle client-side routing
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-
-[dev]
-  framework = "next"
-  targetPort = 3000
-  publish = ".next"
-  command = "npm run dev"
