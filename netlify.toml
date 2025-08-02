@@ -18,6 +18,11 @@
 
 # Redirect all API requests to Netlify Functions
 [[redirects]]
+  from = "/api/hello"
+  to = "/.netlify/functions/hello"
+  status = 200
+
+[[redirects]]
   from = "/api/content"
   to = "/.netlify/functions/content"
   status = 200
