@@ -1,7 +1,7 @@
 [build]
   command = "npm run build"
   publish = ".next"
-  functions = ".next/functions"
+  functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "18"
@@ -14,13 +14,19 @@
 
 [functions]
   node_bundler = "esbuild"
-  external_node_modules = ["@supabase/ssr", "@supabase/supabase-js"]
+  external_node_modules = ["@supabase/supabase-js"]
 
+# Redirect all API requests to Netlify Functions
 [[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
+  from = "/api/content"
+  to = "/.netlify/functions/content"
   status = 200
-  force = true
+
+# Handle client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
 
 [dev]
   framework = "next"
